@@ -1,14 +1,15 @@
+import { useContext } from "react";
+import { CartContext } from "../store/shopping-cart-context.jsx";
+
 export default function Product({
   id,
   image,
   title,
   price,
-  description,
-  items,
-  onAddToCart,
-  onUpdateToCart
+  description
 }) {
 
+  const {items, onAddToCart, onUpdateToCart} = useContext(CartContext);
   let itemQuantity, element;
   if(items !== undefined && items.length > 0){
     element = items.find((item)=> item.id === id);
