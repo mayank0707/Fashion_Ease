@@ -10,10 +10,12 @@ export default function Product({
 }) {
 
   const {items, onAddToCart, onUpdateToCart} = useContext(CartContext);
+
   let itemQuantity, element;
+
   if(items !== undefined && items.length > 0){
     element = items.find((item)=> item.id === id);
-    console.log(element);
+    
     if (element !== undefined) {
       itemQuantity = element.quantity;
     }
