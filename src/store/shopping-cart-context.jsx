@@ -3,16 +3,23 @@ import { DUMMY_PRODUCTS } from "../dummy-products.js";
 
 export const CartContext = createContext({
     items: [],
+    favoriteItem : [],
     onAddToCart : () => {},
-    onUpdateToCart : () => {}
+    onUpdateToCart : () => {},
+    onAddToFavorite : () => {}
 });
 
 export default function CartContextProvider({children}){
   
   const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+  const favoriteItems = JSON.parse(localStorage.getItem('favoriteItems')) || [];
 
   const [shoppingCart, setShoppingCart] = useState({
       items: []
+  });
+
+  const [favoriteShoppingItem, setFavoriteShoppingItems] = useState({
+      favoriteItem: []
   });
 
   useEffect(() => {
@@ -20,6 +27,38 @@ export default function CartContextProvider({children}){
       items: cartItems
     });
     }, []);
+  
+  useEffect(() => {
+    setFavoriteShoppingItems({
+      favoriteItem: favoriteItems
+    });
+  }, []);
+
+  function handleAddToFavorite(id){
+    setFavoriteShoppingItems((prevFavoriteItems)=>{
+      const favorite = [...prevFavoriteItems.favoriteItem];    
+      const existingFavoriteItemIndex = favorite.findIndex((item)=>item.id === id);
+      const existingFavItem = favorite[existingFavoriteItemIndex];
+
+      if(existingFavItem){
+        favorite.pop(id);
+      }
+      else{
+        const product = DUMMY_PRODUCTS.find((product) => product.id === id);
+        favorite.push({
+          id: id,
+          name: product.title,
+          price: product.price
+        });
+      }
+      
+      localStorage.setItem('favoriteItems', JSON.stringify(favorite));
+
+      return {
+        favoriteItem: favorite,
+      };
+    });
+  }
 
   function handleAddItemToCart(id) {
 
@@ -91,8 +130,10 @@ export default function CartContextProvider({children}){
   
   const ctxValue = {
       items : shoppingCart.items,
+      favoriteItem : favoriteShoppingItem.favoriteItem,
       onAddToCart : handleAddItemToCart,
-      onUpdateToCart : handleUpdateCartItemQuantity
+      onUpdateToCart : handleUpdateCartItemQuantity,
+      onAddToFavorite : handleAddToFavorite
   };
 
   return <CartContext.Provider value={ctxValue}>{children}</CartContext.Provider>
